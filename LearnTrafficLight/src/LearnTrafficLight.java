@@ -17,10 +17,10 @@ public class LearnTrafficLight {
 		double v[][] = new double[hiddennumber][outputnumber];
 		double fixw[][] = new double[inputnumber][hiddennumber];
 		double fixv[][] = new double[hiddennumber][outputnumber];
-		
+
 		double[] hbias = new double[hiddennumber];
 		double[] obias = new double[outputnumber];
-		
+
 		double[] fixh = new double[hiddennumber];
 		double[] fixo = new double[outputnumber];
 
@@ -74,7 +74,6 @@ public class LearnTrafficLight {
 				hiddenoutput[i] = sigmod(hiddeninput[i]);
 			}
 
-			
 			for (int i = 0; i < outputnumber; i++) {
 				double temp = 0;
 				for (int j = 0; j < hiddennumber; j++) {
@@ -86,15 +85,62 @@ public class LearnTrafficLight {
 				outlayeroutput[i] = sigmod(outlayerinput[i]);
 			}
 
+			for (int i = 0; i < hiddennumber; i++) {
+				for (int j = 0; j < outputnumber; j++) {
+					fixv[i][j] = -rate * (outlayeroutput[j] - sampleout[j])
+							* outlayeroutput[j] * (1 - outlayeroutput[j])
+							* hiddenoutput[i];
+					v[i][j] += fixv[i][j];
+
+				}
+
+			}
+
+			for (int i = 0; i < outputnumber; i++) {
+				fixo[i] = rate * (outlayeroutput[i] - sampleout[i])
+						* outlayeroutput[i] * (1 - outlayeroutput[i]);
+				obias[i] += fixo[i];
+			}
+
+			for (int k = 0; k < inputnumber; k++) {
+				for (int i = 0; i < hiddennumber; i++) {
+					double temp = 0;
+					for (int j = 0; j < outputnumber; j++) {
+
+						temp += (outlayeroutput[j] - sampleout[j])
+								* outlayeroutput[j] * (1 - outlayeroutput[j])
+								* v[i][j];
+						// w[i][j] += fixw[i][j];
+
+					}
+					
+					fixw[k][i] = -rate*temp*hiddenoutput[i]*(1-hiddenoutput[i])*samplein[k];
+					w[k][i] += fixw[k][i];
+                    
+				}
+			}
 			
-			
+			for (int n = 0; n < inputnumber; n++) {
+				for (int p = 0; p < hiddennumber; p++) {
+					double temp = 0;
+					for (int q = 0; q < outputnumber; q++) {
+
+						temp += (outlayeroutput[q] - sampleout[q])
+								* outlayeroutput[q] * (1 - outlayeroutput[q])
+								* v[p][q];
+						
+
+					}
+					
+					fixh[p] = rate*temp*hiddenoutput[p]*(1-hiddenoutput[p]);
+					hbias[p] += fixh[p];
+                    
+				}
+			}
+
 			count++;
-			
-			
 
 		}
-		
-		
 
 		br.close();
 		fr.close();
