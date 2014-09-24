@@ -1,117 +1,103 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 public class LearnTrafficLight {
-	
-	public static void main(String[] args) {
-		double[] sampleinput = new double[10];
-		double[] sampleoutput = new double[10];
-		for (int i = 0; i < 10; i++) {
-			sampleinput[i] = i;
-			sampleoutput[i] = sigmod(Math.sin(i));
-            //System.out.println(sampleoutput[i]);
-		}
-		
-		int learntimes = 200000;
-		double samplein = 0;
-		double sampleout = 0;
-		int hiddenlayers = 10;
-		double[] hiddeninput = new double[hiddenlayers];
-		double[] hiddenoutput = new double[hiddenlayers];
 
-		double[] hbias = new double[hiddenlayers];
-		for (int i = 0; i < hiddenlayers; i++)
-			hbias[i] = Math.random();
-		
-		double[] w = new double[hiddenlayers];
-		for (int i = 0; i < hiddenlayers; i++)
-			w[i] = Math.random();
-		
-		double[] v = new double[hiddenlayers];
-		for (int i = 0; i < hiddenlayers; i++)
-			v[i] = Math.random();
-		
-		double obias = 0.5;
+	public static void main(String[] args) throws IOException {
 
-		double outlayerinput;
-		double outlayeroutput;
-
-		double[] fixv = new double[hiddenlayers];
-		double fixobias;
-		double[] fixw = new double[hiddenlayers];
-		double[] fixhbias = new double[hiddenlayers];
-		double rate = 0.2;
-
+		int learntimes = 50;
 		int count = 0;
+		int inputnumber = 7;
+		int outputnumber = 10;
+		int hiddennumber = 30;
+		double[] samplein = new double[7];
+		double[] sampleout = new double[10];
+		double w[][] = new double[inputnumber][hiddennumber];
+		double v[][] = new double[hiddennumber][outputnumber];
+		double fixw[][] = new double[inputnumber][hiddennumber];
+		double fixv[][] = new double[hiddennumber][outputnumber];
 		
-		while (count < learntimes){
-			samplein = sampleinput[count%10];
-			sampleout = sampleoutput[count%10];
-			
-			for (int i = 0; i < hiddenlayers; i++) {
-				hiddeninput[i] = samplein * w[i] - hbias[i];
+		double[] hbias = new double[hiddennumber];
+		double[] obias = new double[outputnumber];
+		
+		double[] fixh = new double[hiddennumber];
+		double[] fixo = new double[outputnumber];
+
+		double[] hiddeninput = new double[hiddennumber];
+		double[] hiddenoutput = new double[hiddennumber];
+
+		double[] outlayerinput = new double[outputnumber];
+		double[] outlayeroutput = new double[outputnumber];
+
+		double rate = 0.2;
+		/**** initial ****/
+
+		for (int i = 0; i < 10; i++)
+			sampleout[i] = 0;
+
+		for (int i = 0; i < inputnumber; i++)
+			for (int j = 0; j < hiddennumber; j++)
+				w[i][j] = Math.random();
+
+		for (int i = 0; i < hiddennumber; i++)
+			for (int j = 0; j < outputnumber; j++)
+				v[i][j] = Math.random();
+
+		for (int i = 0; i < hiddennumber; i++)
+			hbias[i] = Math.random();
+
+		for (int i = 0; i < outputnumber; i++)
+			obias[i] = Math.random();
+		FileReader fr = new FileReader("learn.txt");
+
+		BufferedReader br = new BufferedReader(fr);
+		br.mark(200);
+		while (count < learntimes) {
+			String line = "";
+			String[] arrs = null;
+			if (count % 10 == 0)
+				br.reset();
+			line = br.readLine();
+			arrs = line.split(" ");
+			sampleout[Integer.parseInt(arrs[7])] = 1;
+			// System.out.println(arrs[0] + ":" + arrs[1] + ":" + arrs[2]);
+
+			for (int i = 0; i < hiddennumber; i++) {
+				double temp = 0;
+				for (int j = 0; j < inputnumber; j++) {
+
+					temp += samplein[j] * w[j][i];
+
+				}
+				hiddeninput[i] = temp - hbias[i];
 				hiddenoutput[i] = sigmod(hiddeninput[i]);
-
 			}
 
 			
-			double temp = 0;
-			for (int i = 0; i < hiddenlayers; i++)
-				temp +=  hiddenoutput[i] * v[i];
-			
-			outlayerinput = temp - obias;
-			outlayeroutput = sigmod(outlayerinput);
-	          
-			for (int i = 0; i < hiddenlayers; i++) {
-				fixv[i] = -rate * (outlayeroutput - sampleout) * outlayeroutput
-						* (1 - outlayeroutput) * hiddenoutput[i];
-				v[i] += fixv[i];
+			for (int i = 0; i < outputnumber; i++) {
+				double temp = 0;
+				for (int j = 0; j < hiddennumber; j++) {
+
+					temp += hiddenoutput[j] * v[j][i];
+
+				}
+				outlayerinput[i] = temp - obias[i];
+				outlayeroutput[i] = sigmod(outlayerinput[i]);
 			}
 
-			fixobias = rate * (outlayeroutput - sampleout) * outlayeroutput
-					* (1 - outlayeroutput);
-            obias += fixobias;
 			
-            for (int i = 0; i < hiddenlayers; i++) {
-				fixw[i] = -rate * (outlayeroutput - sampleout) * outlayeroutput
-						* (1 - outlayeroutput) * v[i] * hiddenoutput[i]
-						* (1 - hiddenoutput[i]) * samplein;
-				w[i] += fixw[i];
-				fixhbias[i] = rate * (outlayeroutput - sampleout) * outlayeroutput
-						* (1 - outlayeroutput) * v[i] * hiddenoutput[i]
-						* (1 - hiddenoutput[i]);
-				hbias[i] += fixhbias[i];
-			}
 			
-            System.out.println(count+": "+w[0]+" "+v[0]+" "+hbias[0]+" "+obias);
 			count++;
-		}
-		
-		samplein = (Math.PI)/6;
-		for (int i = 0; i < hiddenlayers; i++) {
-			hiddeninput[i] = samplein * w[i] - hbias[i];
 			
-			hiddenoutput[i] = sigmod(hiddeninput[i]);
+			
 
 		}
+		
+		
 
-		//for (int i = 0; i < 2; i++) {
-			//outlayerinput += (hiddenoutput[i] * v[i]);
-
-		//}
-		
-		//outlayerinput -= obias;
-		double temp1 = 0;
-		for (int i = 0; i < hiddenlayers; i++)
-			temp1 +=  hiddenoutput[i] * v[i];
-		
-		outlayerinput = temp1 - obias;
-		outlayeroutput = sigmod(outlayerinput);
-		System.out.println(outlayerinput);
-		System.out.println(outlayeroutput);
-		System.out.println(sigmod(0.5));
-		
-		//System.out.println(sigmod(0));
-		
-		
+		br.close();
+		fr.close();
 
 	}
 
@@ -122,7 +108,7 @@ public class LearnTrafficLight {
 		double result = 1 / y;
 		return result;
 	}
-	
-	//private static void 
+
+	// private static void
 
 }
