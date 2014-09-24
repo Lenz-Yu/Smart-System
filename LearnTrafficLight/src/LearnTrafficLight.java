@@ -2,11 +2,15 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 
+/**
+ * @author 12302010025 Zhenqu_Yu 
+ *
+ */
 public class LearnTrafficLight {
 
 	public static void main(String[] args) throws IOException {
 
-		int learntimes = 50;
+		int learntimes = 100000;
 		int count = 0;
 		int inputnumber = 7;
 		int outputnumber = 10;
@@ -33,9 +37,6 @@ public class LearnTrafficLight {
 		double rate = 0.2;
 		/**** initial ****/
 
-		for (int i = 0; i < 10; i++)
-			sampleout[i] = 0;
-
 		for (int i = 0; i < inputnumber; i++)
 			for (int j = 0; j < hiddennumber; j++)
 				w[i][j] = Math.random();
@@ -60,8 +61,13 @@ public class LearnTrafficLight {
 				br.reset();
 			line = br.readLine();
 			arrs = line.split(" ");
+			for (int i = 0; i < 10; i++)
+				sampleout[i] = 0;
 			sampleout[Integer.parseInt(arrs[7])] = 1;
-			// System.out.println(arrs[0] + ":" + arrs[1] + ":" + arrs[2]);
+			
+			for(int i = 0; i <7; i++)
+				samplein[i] = Integer.parseInt(arrs[i]);
+		
 
 			for (int i = 0; i < hiddennumber; i++) {
 				double temp = 0;
@@ -113,13 +119,14 @@ public class LearnTrafficLight {
 						// w[i][j] += fixw[i][j];
 
 					}
-					
-					fixw[k][i] = -rate*temp*hiddenoutput[i]*(1-hiddenoutput[i])*samplein[k];
+
+					fixw[k][i] = -rate * temp * hiddenoutput[i]
+							* (1 - hiddenoutput[i]) * samplein[k];
 					w[k][i] += fixw[k][i];
-                    
+
 				}
 			}
-			
+
 			for (int n = 0; n < inputnumber; n++) {
 				for (int p = 0; p < hiddennumber; p++) {
 					double temp = 0;
@@ -128,13 +135,13 @@ public class LearnTrafficLight {
 						temp += (outlayeroutput[q] - sampleout[q])
 								* outlayeroutput[q] * (1 - outlayeroutput[q])
 								* v[p][q];
-						
 
 					}
-					
-					fixh[p] = rate*temp*hiddenoutput[p]*(1-hiddenoutput[p]);
+
+					fixh[p] = rate * temp * hiddenoutput[p]
+							* (1 - hiddenoutput[p]);
 					hbias[p] += fixh[p];
-                    
+
 				}
 			}
 
@@ -144,9 +151,42 @@ public class LearnTrafficLight {
 
 		br.close();
 		fr.close();
+		samplein[0] = 1;
+		samplein[1] = 1;
+		samplein[2] = 1;
+		samplein[3] = 1;
+		samplein[4] = 1;
+		samplein[5] = 1;
+		samplein[6] = 1;
+		
+		for (int i = 0; i < hiddennumber; i++) {
+			double temp = 0;
+			for (int j = 0; j < inputnumber; j++) {
+
+				temp += samplein[j] * w[j][i];
+
+			}
+			hiddeninput[i] = temp - hbias[i];
+			hiddenoutput[i] = sigmod(hiddeninput[i]);
+		}
+
+		for (int i = 0; i < outputnumber; i++) {
+			double temp = 0;
+			for (int j = 0; j < hiddennumber; j++) {
+
+				temp += hiddenoutput[j] * v[j][i];
+
+			}
+			outlayerinput[i] = temp - obias[i];
+			outlayeroutput[i] = sigmod(outlayerinput[i]);
+			System.out.println(outlayeroutput[i]);
+		}
+
+		
 
 	}
 
+	
 	private static double sigmod(double x) {
 
 		double y = 1 + Math.exp(-x);
@@ -154,7 +194,5 @@ public class LearnTrafficLight {
 		double result = 1 / y;
 		return result;
 	}
-
-	// private static void
 
 }
