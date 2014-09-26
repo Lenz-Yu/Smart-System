@@ -10,11 +10,11 @@ public class LearnTrafficLight {
 
 	public static void main(String[] args) throws IOException {
 
-		int learntimes = 100000;
+		int learntimes = 300000;
 		int count = 0;
 		int inputnumber = 7;
 		int outputnumber = 10;
-		int hiddennumber = 30;
+		int hiddennumber = 18;
 		double[] samplein = new double[7];
 		double[] sampleout = new double[10];
 		double w[][] = new double[inputnumber][hiddennumber];
@@ -62,8 +62,8 @@ public class LearnTrafficLight {
 			line = br.readLine();
 			arrs = line.split(" ");
 			for (int i = 0; i < 10; i++)
-				sampleout[i] = 0;
-			sampleout[Integer.parseInt(arrs[7])] = 1;
+				sampleout[i] = sigmod(0);
+			sampleout[Integer.parseInt(arrs[7])] = sigmod(1);
 			
 			for(int i = 0; i <7; i++)
 				samplein[i] = Integer.parseInt(arrs[i]);
@@ -179,7 +179,7 @@ public class LearnTrafficLight {
 			}
 			outlayerinput[i] = temp - obias[i];
 			outlayeroutput[i] = sigmod(outlayerinput[i]);
-			System.out.println(outlayeroutput[i]);
+			System.out.println(outlayerinput[i]);
 		}
 
 		
