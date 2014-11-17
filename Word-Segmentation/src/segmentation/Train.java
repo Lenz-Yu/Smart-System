@@ -239,6 +239,24 @@ public class Train {
 //							if (preput.get(q).length()==2&&preput.get(q).charAt(0)=='0'){
 //								int[] temp = results.get(q);
 //								temp[right]+=2;
+//								Hemp[max]-=2;
+//
+//								templates.put(preput.get(q), temp);
+//								continue;
+//								}
+							
+//							if (preput.get(q).length()==5&&preput.get(q).charAt(0)=='-'&&preput.get(q).charAt(1)=='1'&&preput.get(q).charAt(3)=='1'){
+//								int[] temp = results.get(q);
+//								temp[right]+=5;
+//								temp[max]-=5;
+//
+//								templates.put(preput.get(q), temp);
+//								continue;
+//								}
+							
+//							if (preput.get(q).length()==6&&preput.get(q).charAt(1)=='-'&&preput.get(q).charAt(2)=='1'&&preput.get(q).charAt(4)=='0'){
+//								int[] temp = results.get(q);
+//								temp[right]+=2;
 //								temp[max]-=2;
 //
 //								templates.put(preput.get(q), temp);
